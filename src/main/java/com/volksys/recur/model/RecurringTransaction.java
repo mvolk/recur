@@ -1,6 +1,7 @@
 package com.volksys.recur.model;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.Period;
 
 /**
  * Represents a financial transaction that occurs on a regular basis.
@@ -8,8 +9,8 @@ import java.util.Date;
 public class RecurringTransaction {
     private final int amount;
     private final String category;
-    private final Date initialOccurrence;
-    private final Periodicity periodicity;
+    private final LocalDate initialOccurrence;
+    private final Period period;
 
     /**
      * Constructor.
@@ -17,13 +18,13 @@ public class RecurringTransaction {
      * @param amount The amount of the transaction in hundredths of a whole currency unit.
      * @param category The name of the budget category to which this transaction belongs
      * @param initialOccurrence The first occurrence of this transaction
-     * @param periodicity The amount of time that passes between occurrences of this transaction
+     * @param period The amount of time that passes between occurrences of this transaction
      */
-    public RecurringTransaction(int amount, String category, Date initialOccurrence, Periodicity periodicity) {
+    public RecurringTransaction(int amount, String category, LocalDate initialOccurrence, Period period) {
         this.amount = amount;
         this.category = category;
         this.initialOccurrence = initialOccurrence;
-        this.periodicity = periodicity;
+        this.period = period;
     }
 
     /**
@@ -49,16 +50,16 @@ public class RecurringTransaction {
      *
      * @return the date of the first transaction
      */
-    public Date getInitialOccurrence() {
+    public LocalDate getInitialOccurrence() {
         return initialOccurrence;
     }
 
     /**
      * The amount of time that passes between each occurrence of this transaction.
      *
-     * @return the periodicity of this transaction
+     * @return the period of this transaction
      */
-    public Periodicity getPeriodicity() {
-        return periodicity;
+    public Period getPeriod() {
+        return period;
     }
 }
