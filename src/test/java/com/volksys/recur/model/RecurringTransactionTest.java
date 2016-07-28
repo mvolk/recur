@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class RecurringTransactionTest {
 
+    /** Iterator returns the initial occurrence first. */
     @Test
     @DisplayName("Iterator starts with initial occurrence")
     public void testIteratorStartsAtInitialOccurrence() {
@@ -24,8 +25,9 @@ public class RecurringTransactionTest {
         assertEquals(now, iterator.next().getDate());
     }
 
+    /** Iterator returns transactions in chronological order. */
     @Test
-    @DisplayName("Iterator returns transactions spaced at recurrence period")
+    @DisplayName("Iterator returns transactions in chronological order.")
     public void testIteratorRecurrencePeriod() {
         LocalDate now = LocalDate.now();
         Period period = Period.ofMonths(1);
