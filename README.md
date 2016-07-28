@@ -11,6 +11,8 @@ problems.
 Light on test coverage, so the usual "use at your own risk" caution has extra weight
 on this project.
 
+[![Build Status](https://travis-ci.org/mvolk/recur.svg?branch=master)](https://travis-ci.org/mvolk/recur)
+
 ## Build
 
     ./gradlew clean build
