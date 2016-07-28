@@ -2,11 +2,12 @@ package com.volksys.recur.model;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Iterator;
 
 /**
  * Represents a financial transaction that occurs on a regular basis.
  */
-public class RecurringTransaction {
+public class RecurringTransaction implements Iterable<Transaction> {
     private final int amount;
     private final String category;
     private final LocalDate initialOccurrence;
@@ -62,4 +63,29 @@ public class RecurringTransaction {
     public Period getPeriod() {
         return period;
     }
+
+    /**
+     * Iterator over all occurrences of this transaction in chronological order.
+     *
+     * @return all occurrences of this transaction in natural (ascending) chronological order
+     */
+    @Override
+    public Iterator<Transaction> iterator() {
+        return new Iterator<Transaction>() {
+            private LocalDate date = initialOccurrence;
+
+            @Override
+            public boolean hasNext() {
+                return true;
+            }
+
+            @Override
+            public Transaction next() {
+                Transaction transaction = new Transaction(amount, category, date);
+                date = date.plus(period);
+                return transaction;
+            }
+        };
+    }
+
 }
