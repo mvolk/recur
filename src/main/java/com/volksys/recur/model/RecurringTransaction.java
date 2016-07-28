@@ -75,9 +75,9 @@ public class RecurringTransaction implements Iterable<Transaction> {
             private LocalDate date = initialOccurrence;
 
             /**
-             * {@inheritDoc}
+             * Indicates whether there is another transaction.
              *
-             * @return {@inheritDoc}
+             * @return {@code true} if there is another transaction
              */
             @Override
             public boolean hasNext() {
@@ -85,9 +85,10 @@ public class RecurringTransaction implements Iterable<Transaction> {
             }
 
             /**
-             * {@inheritDoc}
+             * The next transaction chronologically.
              *
-             * @return {@inheritDoc}
+             * @return the transaction that occurs soonest after the transaction returned by the last invocation of
+             *         this method, or the first transaction if this method has not previously been invoked.
              */
             @Override
             public Transaction next() {
