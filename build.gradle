@@ -4,6 +4,7 @@ buildscript {
     }
     dependencies {
         classpath "info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.9"
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.0-M2'
     }
 }
 
@@ -24,9 +25,18 @@ repositories {
 }
 
 dependencies {
-    testCompile 'junit:junit:4.+'
-    testCompile 'org.mockito:mockito-all:1.10.19'
+    testCompile 'org.junit.platform:junit-platform-commons:1.0.0-M2'
+    testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.0-M2'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.0-M2'
 }
+
+compileTestJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    options.compilerArgs += '-parameters'
+}
+
+apply plugin: 'org.junit.platform.gradle.plugin'
 
 apply plugin: 'checkstyle'
 checkstyle {
@@ -48,17 +58,26 @@ pmd {
 }
 
 apply plugin: 'jacoco'
-jacoco {
-    toolVersion = "0.7.6.201602180812"
-}
-jacocoTestReport {
-    reports {
-        xml.enabled true
-        csv.enabled false
-        html.destination "$project.buildDir/reports/jacoco-html"
+// The JUnit5Plugin registers the junitPlatformTest task after the project has been evaluated
+//  so junitPlatformTest task cannot be configured until after evaluation of the project.
+afterEvaluate {
+    jacoco {
+        toolVersion = "0.7.7.201606060606"
+        applyTo junitPlatformTest
     }
+    task junit5CodeCoverageReport(type:JacocoReport) {
+        executionData junitPlatformTest
+        sourceSets sourceSets.main
+        sourceDirectories = files(sourceSets.main.allSource.srcDirs)
+        classDirectories = files(sourceSets.main.output)
+        reports {
+            xml.enabled = true
+            html.enabled = true
+            html.destination "$project.buildDir/reports/jacoco-html"
+        }
+    }
+    check.dependsOn junit5CodeCoverageReport
 }
-check.dependsOn jacocoTestReport
 
 apply plugin: "info.solidsoft.pitest"
 pitest {

@@ -1,12 +1,13 @@
 package com.volksys.recur;
 
 import com.volksys.recur.model.BudgetPeriod;
-import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link ApplicationTest}.
@@ -15,6 +16,7 @@ public class ApplicationTest {
 
     /** Budget periods are generated correctly. */
     @Test
+    @DisplayName("Budget periods are generated for each month in the year")
     public void testGetBudgetPeriods() {
         Application application = new Application(2012);
         List<BudgetPeriod> budgetPeriodList = application.getBudgetPeriods();
