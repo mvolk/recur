@@ -1,6 +1,7 @@
 package com.volksys.recur;
 
-import com.volksys.recur.model.BudgetPeriod;
+import com.volksys.recur.model.Budget;
+import com.volksys.recur.model.LocalDateRange;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -25,31 +26,31 @@ public class Application {
      * Performs the work.
      */
     private void run() {
-        List<BudgetPeriod> budgetPeriods = getBudgetPeriods();
+        List<Budget> budgets = getBudgets();
         DateTimeFormatter dtf = DateTimeFormatter.ISO_LOCAL_DATE;
-        for (BudgetPeriod period : budgetPeriods) {
-            System.out.println(dtf.format(period.getStartDate()) + " - "
-                    + dtf.format(period.getEndDate().minus(1, ChronoUnit.DAYS)) + ": $0.00");
+        for (Budget period : budgets) {
+            System.out.println(dtf.format(period.getDateRange().getStartInclusive()) + " - "
+                    + dtf.format(period.getDateRange().getEndExclusive().minus(1, ChronoUnit.DAYS)) + ": $0.00");
         }
     }
 
     /**
-     * Generates an ordered list of {@link BudgetPeriod}s covering the entire year.
+     * Generates an ordered list of {@link Budget}s covering the entire year.
      *
      * @return a list of budget periods ready to be populated
      */
-    protected List<BudgetPeriod> getBudgetPeriods() {
-        List<BudgetPeriod> budgetPeriods = new ArrayList<>(12);
+    protected List<Budget> getBudgets() {
+        List<Budget> budgets = new ArrayList<>(12);
         for (Month month : Month.values()) {
-            budgetPeriods.add(createBudgetPeriod(year, month));
+            budgets.add(createBudget(year, month));
         }
-        return budgetPeriods;
+        return budgets;
     }
 
-    private BudgetPeriod createBudgetPeriod(int year, Month month) {
+    private Budget createBudget(int year, Month month) {
         LocalDate start = LocalDate.of(year, month, 1);
         LocalDate end = start.plusMonths(1);
-        return new BudgetPeriod(start, end);
+        return new Budget(new LocalDateRange(start, end));
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.volksys.recur;
 
-import com.volksys.recur.model.BudgetPeriod;
+import com.volksys.recur.model.Budget;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,13 +19,13 @@ public class ApplicationTest {
     @DisplayName("Budget periods are generated for each month in the year")
     public void testGetBudgetPeriods() {
         Application application = new Application(2012);
-        List<BudgetPeriod> budgetPeriodList = application.getBudgetPeriods();
+        List<Budget> budgetPeriodList = application.getBudgets();
         assertEquals(12, budgetPeriodList.size());
         int month = 1;
-        for (BudgetPeriod period : budgetPeriodList) {
-            LocalDate start = period.getStartDate();
+        for (Budget period : budgetPeriodList) {
+            LocalDate start = period.getDateRange().getStartInclusive();
             verify(start, 2012, month, 1);
-            LocalDate end = period.getEndDate();
+            LocalDate end = period.getDateRange().getEndExclusive();
             if (month < 12) {
                 verify(end, 2012, month + 1, 1);
             } else {
