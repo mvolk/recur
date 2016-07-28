@@ -74,11 +74,21 @@ public class RecurringTransaction implements Iterable<Transaction> {
         return new Iterator<Transaction>() {
             private LocalDate date = initialOccurrence;
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return {@inheritDoc}
+             */
             @Override
             public boolean hasNext() {
                 return true;
             }
 
+            /**
+             * {@inheritDoc}
+             *
+             * @return {@inheritDoc}
+             */
             @Override
             public Transaction next() {
                 Transaction transaction = new Transaction(amount, category, date);
