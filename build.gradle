@@ -1,0 +1,68 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.9"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+def bootstrapClassPath = "${System.getenv()['JAVA_HOME']}/jre/lib/rt.jar"
+project.tasks.withType(AbstractCompile, { AbstractCompile ac ->
+    ac.options.bootClasspath = bootstrapClassPath
+})
+
+version = '0.1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile 'junit:junit:4.+'
+    testCompile 'org.mockito:mockito-all:1.10.19'
+}
+
+apply plugin: 'checkstyle'
+checkstyle {
+    toolVersion = "6.18"
+}
+tasks.withType(Checkstyle) {
+    reports {
+        xml.enabled true
+    }
+}
+
+apply plugin: 'pmd'
+pmd {
+    sourceSets = [sourceSets.main, sourceSets.test]
+    reportsDir = file("$project.buildDir/reports/pmd")
+    ruleSetFiles = files("config/pmd/ruleset.xml")
+    consoleOutput = true
+    toolVersion = "5.4.1"
+}
+
+apply plugin: 'jacoco'
+jacoco {
+    toolVersion = "0.7.6.201602180812"
+}
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.destination "$project.buildDir/reports/jacoco-html"
+    }
+}
+check.dependsOn jacocoTestReport
+
+apply plugin: "info.solidsoft.pitest"
+pitest {
+    targetClasses = ['com.ciderref.*']
+    threads = 4
+    outputFormats = ['XML', 'HTML']
+}
