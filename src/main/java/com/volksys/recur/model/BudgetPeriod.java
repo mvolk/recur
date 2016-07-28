@@ -16,7 +16,7 @@ public class BudgetPeriod {
      * Constructor.
      *
      * @param startDate the beginning of the budget period, inclusive
-     * @param endDate the end of the budget period, inclusive
+     * @param endDate the end of the budget period, exclusive
      */
     public BudgetPeriod(Date startDate, Date endDate) {
         this.startDate = startDate;
@@ -34,7 +34,7 @@ public class BudgetPeriod {
     }
 
     /**
-     * The inclusive end of the budget period.
+     * The exclusive end of the budget period.
      *
      * @return budget period ending date
      */
