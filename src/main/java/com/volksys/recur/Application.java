@@ -4,7 +4,12 @@ import com.volksys.recur.model.Budget;
 import com.volksys.recur.model.LocalDateRange;
 import com.volksys.recur.model.RecurringTransaction;
 import com.volksys.recur.model.Transaction;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -19,19 +24,30 @@ import java.util.List;
 /**
  * Main application.
  */
-@SuppressWarnings("PMD.SystemPrintln")
+@SuppressWarnings({"PMD.SystemPrintln", "PMD.AvoidPrintStackTrace", "PMD.AvoidCatchingGenericException"})
 public class Application {
 
-    private final LocalDateRange budgetYear;
+    private static final String FIELD_DESCRIPTION = "Description";
+    private static final String FIELD_AMOUNT = "Amount";
+    private static final String FIELD_START = "Start";
+    private static final String FIELD_END = "End";
+    private static final String FIELD_PERIOD = "Period";
+    private static final String FIELD_PERIOD_UNITS = "Units";
+    private static final String FIELD_CATEGORY = "Category";
+    private static final String FIELD_ENABLED = "Enabled";
 
-    protected Application(int year) {
+    private final LocalDateRange budgetYear;
+    private final String path;
+
+    protected Application(int year, String path) {
         budgetYear = new LocalDateRange(LocalDate.of(year, Month.JANUARY, 1), LocalDate.of(year + 1, Month.JANUARY, 1));
+        this.path = path;
     }
 
     /**
      * Performs the work.
      */
-    private void run() {
+    private void run() throws IOException {
         List<Budget> budgets = getBudgets();
         List<RecurringTransaction> recurringTransactions = getRecurringTransactions();
         populateBudget(budgets, recurringTransactions);
@@ -80,12 +96,53 @@ public class Application {
      *
      * @return list of recurring transactions
      */
-    protected List<RecurringTransaction> getRecurringTransactions() {
+    protected List<RecurringTransaction> getRecurringTransactions() throws IOException {
         List<RecurringTransaction> list = new ArrayList<>();
-        list.add(new RecurringTransaction(75000, "Quarterly", LocalDate.of(2016, Month.MARCH, 31), Period.ofMonths(3)));
-        list.add(new RecurringTransaction(500, "Monthly", LocalDate.of(2016, Month.JANUARY, 5), Period.ofMonths(1)));
-        list.add(new RecurringTransaction(999, "Monthly", LocalDate.of(2016, Month.JANUARY, 15), Period.ofMonths(1)));
+        Reader in = new FileReader(path);
+        for (CSVRecord record : CSVFormat.DEFAULT.withFirstRecordAsHeader().parse(in)) {
+            boolean enabled = record.get(FIELD_ENABLED).equalsIgnoreCase("true");
+            if (enabled) {
+                addRecurringTransaction(record, list);
+            }
+        }
         return list;
+    }
+
+    private void addRecurringTransaction(CSVRecord record, List<RecurringTransaction> list) {
+        String description = record.get(FIELD_DESCRIPTION);
+        if (description != null) {
+            description = description.trim();
+        }
+        int amount = (int) Math.round(100 * Double.parseDouble(record.get(FIELD_AMOUNT)));
+        LocalDate start = LocalDate.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(record.get(FIELD_START)));
+        String endString = record.get(FIELD_END);
+        LocalDate end = null;
+        if (endString != null && !endString.trim().isEmpty()) {
+            end = LocalDate.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(record.get(FIELD_END)));
+        }
+        int period = Integer.parseInt(record.get(FIELD_PERIOD));
+        ChronoUnit units = ChronoUnit.valueOf(record.get(FIELD_PERIOD_UNITS));
+        String category = record.get(FIELD_CATEGORY);
+
+        RecurringTransaction recurringTransaction = new RecurringTransaction(description, amount, category,
+                start, end, getPeriod(period, units));
+
+        list.add(recurringTransaction);
+    }
+
+    private Period getPeriod(int period, ChronoUnit units) {
+        switch (units) {
+            case DAYS:
+                return Period.ofDays(period);
+            case WEEKS:
+                return Period.ofWeeks(period);
+            case MONTHS:
+                return Period.ofMonths(period);
+            case YEARS:
+                return Period.ofYears(period);
+            default:
+                throw new IllegalArgumentException("Unsupported unit of time: " + units);
+        }
     }
 
     /**
@@ -142,7 +199,19 @@ public class Application {
      * @param args ignored... for now.
      */
     public static void main(String... args) {
-        new Application(2016).run();
+        try {
+            int year = Integer.parseInt(args[0]);
+            String path = args[1];
+            Application application = new Application(year, path);
+            try {
+                application.run();
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+
+        } catch (Exception ignored) {
+            System.out.println("Invoke with the four-digit year and path to CSV file as arguments, in that order");
+        }
     }
 
 }

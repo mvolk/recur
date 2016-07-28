@@ -18,7 +18,7 @@ public class ApplicationTest {
     @Test
     @DisplayName("Budget periods are generated for each month in the year")
     public void testGetBudgetPeriods() {
-        Application application = new Application(2012);
+        Application application = new Application(2012, "no/such/file");
         List<Budget> budgetPeriodList = application.getBudgets();
         assertEquals(12, budgetPeriodList.size());
         int month = 1;

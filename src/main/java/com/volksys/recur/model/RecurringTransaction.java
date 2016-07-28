@@ -11,21 +11,37 @@ public class RecurringTransaction implements Iterable<Transaction> {
     private final int amount;
     private final String category;
     private final LocalDate initialOccurrence;
+    private final LocalDate finalOccurrence;
     private final Period period;
+    private final String description;
 
     /**
      * Constructor.
      *
+     * @param description A description of this transaction
      * @param amount The amount of the transaction in hundredths of a whole currency unit.
      * @param category The name of the budget category to which this transaction belongs
      * @param initialOccurrence The first occurrence of this transaction
+     * @param finalOccurrence (nullable) The last occurrence of this transaction
      * @param period The amount of time that passes between occurrences of this transaction
      */
-    public RecurringTransaction(int amount, String category, LocalDate initialOccurrence, Period period) {
+    public RecurringTransaction(String description, int amount, String category,
+                                LocalDate initialOccurrence, LocalDate finalOccurrence, Period period) {
+        this.description = description;
         this.amount = amount;
         this.category = category;
         this.initialOccurrence = initialOccurrence;
+        this.finalOccurrence = finalOccurrence;
         this.period = period;
+    }
+
+    /**
+     * A description of this transaction.
+     *
+     * @return A description of this transaction.
+     */
+    public String getDescription() {
+        return description;
     }
 
     /**
@@ -56,6 +72,15 @@ public class RecurringTransaction implements Iterable<Transaction> {
     }
 
     /**
+     * The date of the final occurrence of this transaction.
+     *
+     * @return the date past which there are no further occurrences of this transaction
+     */
+    public LocalDate getFinalOccurrence() {
+        return finalOccurrence;
+    }
+
+    /**
      * The amount of time that passes between each occurrence of this transaction.
      *
      * @return the period of this transaction
@@ -81,7 +106,7 @@ public class RecurringTransaction implements Iterable<Transaction> {
              */
             @Override
             public boolean hasNext() {
-                return true;
+                return finalOccurrence == null || !date.isAfter(finalOccurrence);
             }
 
             /**

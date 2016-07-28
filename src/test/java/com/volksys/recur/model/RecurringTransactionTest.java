@@ -20,7 +20,7 @@ public class RecurringTransactionTest {
     public void testIteratorStartsAtInitialOccurrence() {
         LocalDate now = LocalDate.now();
         Period period = Period.ofMonths(1);
-        RecurringTransaction recurringTransaction = new RecurringTransaction(20, "foo", now, period);
+        RecurringTransaction recurringTransaction = new RecurringTransaction("bar", 20, "foo", now, null, period);
         Iterator<Transaction> iterator = recurringTransaction.iterator();
         assertEquals(now, iterator.next().getDate());
     }
@@ -31,7 +31,7 @@ public class RecurringTransactionTest {
     public void testIteratorRecurrencePeriod() {
         LocalDate now = LocalDate.now();
         Period period = Period.ofMonths(1);
-        RecurringTransaction recurringTransaction = new RecurringTransaction(20, "foo", now, period);
+        RecurringTransaction recurringTransaction = new RecurringTransaction("bar", 20, "foo", now, null, period);
         Iterator<Transaction> iterator = recurringTransaction.iterator();
         LocalDate current = now;
         for (int i = 0; i < 3; i++) {
