@@ -1,6 +1,6 @@
 package com.volksys.recur.model;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,8 +8,8 @@ import java.util.Map;
  * Models a budget for a given period of time.
  */
 public class BudgetPeriod {
-    private final Instant startDate;
-    private final Instant endDate;
+    private final LocalDate startDate;
+    private final LocalDate endDate;
     private final Map<String, Integer> lineItems;
 
     /**
@@ -18,7 +18,7 @@ public class BudgetPeriod {
      * @param startDate the beginning of the budget period, inclusive
      * @param endDate the end of the budget period, exclusive
      */
-    public BudgetPeriod(Instant startDate, Instant endDate) {
+    public BudgetPeriod(LocalDate startDate, LocalDate endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.lineItems = new HashMap<>();
@@ -27,18 +27,18 @@ public class BudgetPeriod {
     /**
      * The inclusive beginning of the budget period.
      *
-     * @return budget period starting moment
+     * @return budget period starting date
      */
-    public Instant getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
     /**
      * The exclusive end of the budget period.
      *
-     * @return budget period ending moment
+     * @return budget period ending date
      */
-    public Instant getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
