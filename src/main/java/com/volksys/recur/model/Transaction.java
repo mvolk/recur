@@ -6,6 +6,7 @@ import java.time.LocalDate;
  * Represents a single financial transaction.
  */
 public class Transaction {
+    private final String description;
     private final int amount;
     private final String category;
     private final LocalDate date;
@@ -13,14 +14,25 @@ public class Transaction {
     /**
      * Constructor.
      *
+     * @param description A description of this transaction
      * @param amount the amount of the transaction in hundredths of a whole currency unit.
      * @param category the name of the budget category to which this transaction belongs
      * @param date the date of the transaction
      */
-    public Transaction(int amount, String category, LocalDate date) {
+    public Transaction(String description, int amount, String category, LocalDate date) {
+        this.description = description;
         this.amount = amount;
         this.category = category;
         this.date = date;
+    }
+
+    /**
+     * A description of this transaction.
+     *
+     * @return A description of this transaction.
+     */
+    public String getDescription() {
+        return description;
     }
 
     /**

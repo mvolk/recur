@@ -117,7 +117,7 @@ public class RecurringTransaction implements Iterable<Transaction> {
              */
             @Override
             public Transaction next() {
-                Transaction transaction = new Transaction(amount, category, date);
+                Transaction transaction = new Transaction(description, amount, category, date);
                 date = date.plus(period);
                 return transaction;
             }

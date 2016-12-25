@@ -18,7 +18,6 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -50,17 +49,22 @@ public class Application {
     private void run() throws IOException {
         List<Budget> budgets = getBudgets();
         List<RecurringTransaction> recurringTransactions = getRecurringTransactions();
-        populateBudget(budgets, recurringTransactions);
+        populateMonthlyBudgets(budgets, recurringTransactions);
         DateTimeFormatter dtf = DateTimeFormatter.ISO_LOCAL_DATE;
         NumberFormat nf = new DecimalFormat("$#.00");
         for (Budget period : budgets) {
             System.out.println(dtf.format(period.getDateRange().getStartInclusive()) + " - "
                     + dtf.format(period.getDateRange().getEndExclusive().minus(1, ChronoUnit.DAYS)));
             System.out.println("=======================");
-            List<String> categories = new ArrayList<>(period.getLineItems().keySet()); //NOPMD
-            Collections.sort(categories);
-            for (String category : categories) {
-                System.out.println("  " + category + ": " + nf.format(toCurrency(period.getLineItems().get(category))));
+            for (String category : period.getCategories()) {
+                System.out.println("  " + category + ": " + nf.format(toCurrency(period.getBudgetFor(category))));
+                System.out.println("  - - - - - - - - - - - - - -");
+                for (Transaction t : period.getTransactionsFor(category)) {
+                    System.out.println("  " + t.getDate() + " " + t.getDescription() + " "
+                            + nf.format(toCurrency(t.getAmount())));
+                }
+                System.out.println();
+                System.out.println();
             }
             System.out.println();
             System.out.println();
@@ -153,9 +157,9 @@ public class Application {
      * @param budgets the budget to update
      * @param recurringTransactions the transactions to include in the budget
      */
-    protected void populateBudget(List<Budget> budgets, List<RecurringTransaction> recurringTransactions) {
+    protected void populateMonthlyBudgets(List<Budget> budgets, List<RecurringTransaction> recurringTransactions) {
         for (RecurringTransaction recurringTransaction : recurringTransactions) {
-            populateBudget(budgets, recurringTransaction);
+            populateMonthlyBudgets(budgets, recurringTransaction);
         }
     }
 
@@ -167,7 +171,7 @@ public class Application {
      * @param budgets the budget to update
      * @param recurringTransaction the transaction to include in the budget
      */
-    protected void populateBudget(List<Budget> budgets, RecurringTransaction recurringTransaction) {
+    protected void populateMonthlyBudgets(List<Budget> budgets, RecurringTransaction recurringTransaction) {
         for (Transaction transaction : recurringTransaction) {
             if (transaction.getDate().isBefore(budgetYear.getStartInclusive())) {
                 continue;
@@ -176,21 +180,9 @@ public class Application {
                 break;
             }
             for (Budget budget : budgets) {
-                addTransaction(budget, transaction);
+                budget.addTransaction(transaction);
             }
         }
-    }
-
-    private void addTransaction(Budget budget, Transaction transaction) {
-        if (budget.getDateRange().contains(transaction.getDate())) {
-            String category = transaction.getCategory();
-            int runningTotal = getCategoryTotal(budget, category) + transaction.getAmount();
-            budget.getLineItems().put(category, runningTotal);
-        }
-    }
-
-    private int getCategoryTotal(Budget budget, String category) {
-        return budget.getLineItems().containsKey(category) ? budget.getLineItems().get(category) : 0;
     }
 
     /**
